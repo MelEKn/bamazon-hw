@@ -80,8 +80,8 @@ function customerPrompt(){
         name: "howMany",
         message: "How many would you like to buy?"
       }).then(function(answer) {
-        console.log("You want to buy " + response.itemId);
         console.log("You want to buy " + answer.howMany + " of them");
+        readProducts(response.itemId, answer.howMany);
         
         });
   
@@ -96,4 +96,36 @@ function addSpaces(num){
     spaces += " ";
   }
   return spaces;
+}
+
+function readProducts(itemId, amount) {
+  var queryText = "SELECT * FROM products WHERE ?"
+  connection.query(queryText, [
+    {
+      item_id: itemId
+    }
+  ], function(err, res) {
+    if (err) throw err;
+    // Log all results of the SELECT statement
+    console.log("You want to buy a " + res[0].product_name);
+    console.log("res[0].stock_quantity is " + res[0].stock_quantity);
+
+    // Checks if the user is asking to buy more of an item than is in the inventory. If so, they are given an error message, and brought back to the beginning, where the items are initially displayed.
+    if(amount>res[0].stock_quantity){
+      console.log("I'm sorry, there are only " + res[0].stock_quantity + " " + res[0].product_name + "(s) in stock. Please try again!");
+      displayItems();
+    }
+    //If the program runs the next part, then the amount of an item the user is asking to buy is less than or equal to the available inventory. 
+
+
+    //console.log(res);
+
+
+  });
+}
+
+function updateProducts(itemId, amount){
+    var queryText = "UPDATE products SET ? WHERE ?"
+
+
 }
