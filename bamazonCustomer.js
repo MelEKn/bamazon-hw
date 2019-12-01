@@ -110,11 +110,26 @@ function readProducts(itemId, amount) {
     console.log("You want to buy a " + res[0].product_name);
     console.log("res[0].stock_quantity is " + res[0].stock_quantity);
 
-    // Checks if the user is asking to buy more of an item than is in the inventory. If so, they are given an error message, and brought back to the beginning, where the items are initially displayed.
+    // Checks if the user is asking to buy more of an item than is in the inventory. 
     if(amount>res[0].stock_quantity){
-      console.log("I'm sorry, there are only " + res[0].stock_quantity + " " + res[0].product_name + "(s) in stock. Please try again!");
-      displayItems();
-    }
+
+    //If so, they are given an error message. It's a prompt so that the program doesn't take the user back to the opening screen until they enter any key (or "q" to quit)
+    inquirer.prompt([
+
+      {
+        type: "input",
+        name: "continue",
+        message: "I'm sorry, there are only " + res[0].stock_quantity + " " + res[0].product_name + "(s) in stock. Please try again! \n Please choose any key to continue, or q to quit:"
+      }
+    ]).then(function(response){
+      if(response.itemId==="q"){
+        connection.end();
+      }
+      else{
+        displayItems();
+      }
+    });
+  }
     //If the program runs the next part, then the amount of an item the user is asking to buy is less than or equal to the available inventory. 
     else{
     var newAmount = res[0].stock_quantity - amount;
