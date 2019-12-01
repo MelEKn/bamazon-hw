@@ -21,14 +21,15 @@ connection.connect(function (err) {
   if (err) throw err;
   console.log("connected as id " + connection.threadId + "\n");
   displayItems();
+  customerPrompt();
 });
 
 function displayItems() {
 
-  var displayString = "Item id:   ";
+  var displayString = "\nItem id:   ";
   displayString += "Item:" + addSpaces(18);
   displayString += "Department:" + addSpaces(13);
-  displayString += "Price:" + addSpaces(20);
+  displayString += "Price:" + addSpaces(17);
   displayString += "Inventory:" + "\n\n";
 
   connection.query("SELECT * FROM products", function(err, res) {
@@ -56,7 +57,31 @@ function displayItems() {
     console.log(displayString);
     console.log("-----------------------------------");
   });
-  connection.end();
+  console.log("\n");
+  
+}
+
+function customerPrompt(){
+  inquirer.prompt([
+
+    {
+      type: "input",
+      name: "itemId",
+      message: "Please enter the ID of the item you'd like to buy (enter q to quit): "
+    },
+  
+    {
+      type: "input",
+      name: "howMany",
+      message: "How many would you like to buy?"
+    }
+  ]).then(function(answer) {
+    if(answer.itemId==="q"){
+      console.log("Thank you, please come again soon!");
+      connection.end();
+    }
+
+  });
 }
 
 function addSpaces(num){
