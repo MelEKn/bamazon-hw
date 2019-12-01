@@ -24,8 +24,9 @@ connection.connect(function (err) {
   
 });
 
-function displayItems() {
+//The below shows the user the table of items for sale, their IDs, department, price, and how many are in the inventory
 
+function displayItems() {
   var displayString = "\nItem id:   ";
   displayString += "Item:" + addSpaces(18);
   displayString += "Department:" + addSpaces(13);
@@ -64,7 +65,6 @@ function displayItems() {
 
 function customerPrompt(){
   inquirer.prompt([
-
     {
       type: "input",
       name: "itemId",
@@ -80,7 +80,7 @@ function customerPrompt(){
         name: "howMany",
         message: "How many would you like to buy?"
       }).then(function(answer) {
-        console.log("You want to buy " + answer.howMany + " of them");
+      //sends the itemId the user chose and the amount and sends it to the function readProducts()
         readProducts(response.itemId, answer.howMany);
         
         });
@@ -89,14 +89,17 @@ function customerPrompt(){
   }) 
 }
 
-function addSpaces(num){
+//This function takes "num", which is the number of spaces that should be added to the display in order for the display of items for sale to line up correctly on the user's screen. It returns a string with "num" many spaces.
 
+function addSpaces(num){
   var spaces = "";
   for(var i=0;i<num;i++){
     spaces += " ";
   }
   return spaces;
 }
+
+//The following function gets the information for the row of the table that matches the item_id the user entered
 
 function readProducts(itemId, amount) {
   var queryText = "SELECT * FROM products WHERE ?"
@@ -106,22 +109,21 @@ function readProducts(itemId, amount) {
     }
   ], function(err, res) {
     if (err) throw err;
-    // Log all results of the SELECT statement
-    console.log("You want to buy a " + res[0].product_name);
-    console.log("res[0].stock_quantity is " + res[0].stock_quantity);
 
     // Checks if the user is asking to buy more of an item than is in the inventory. 
     if(amount>res[0].stock_quantity){
 
     //If so, they are given an error message. It's a prompt so that the program doesn't take the user back to the opening screen until they enter any key (or "q" to quit)
     inquirer.prompt([
-
       {
         type: "input",
         name: "continue",
         message: "I'm sorry, there are only " + res[0].stock_quantity + " " + res[0].product_name + "(s) in stock. Please try again! \n Please choose any key to continue, or q to quit:"
       }
     ]).then(function(response){
+     
+   //if the user chooses "q", the program ends. Otherwise, it returns the user to the opening screen to buy more products
+
       if(response.itemId==="q"){
         connection.end();
       }
@@ -134,12 +136,14 @@ function readProducts(itemId, amount) {
     else{
     var newAmount = res[0].stock_quantity - amount;
 
+    //calls the function that updates the database
     updateProducts(itemId, newAmount);
-    //console.log(res);
     var totalCost = res[0].price * amount;
+    totalCost = totalCost.toFixed(2);
 
+    //informs the user of the total cost
+    //it's a prompt so that the message stays on the screen until the user chooses a key (or enters "q" for quit)
     inquirer.prompt([
-
       {
         type: "input",
         name: "userInput",
@@ -153,13 +157,13 @@ function readProducts(itemId, amount) {
         default: 
           displayItems();
       }
-
-
   });
 }
 });
 }
 
+
+//This function updates the database with the new amount of stock for the item that the user purchased
 function updateProducts(itemId, newAmount){
     var queryText = "UPDATE products SET ? WHERE ?";
 
@@ -174,9 +178,6 @@ function updateProducts(itemId, newAmount){
       ],
       function(err, res){
         if (err) throw err;
-        console.log(res.affectedRows + " products updated!\n");
-      }
-    );
-
-
+       // console.log(res.affectedRows + " products updated!\n");
+      });
 }
