@@ -116,14 +116,33 @@ function readProducts(itemId, amount) {
       displayItems();
     }
     //If the program runs the next part, then the amount of an item the user is asking to buy is less than or equal to the available inventory. 
-
+    else{
     var newAmount = res[0].stock_quantity - amount;
 
     updateProducts(itemId, newAmount);
     //console.log(res);
+    var totalCost = res[0].price * amount;
+
+    inquirer.prompt([
+
+      {
+        type: "input",
+        name: "userInput",
+        message: "Successful purchase! You have bought " + amount + " " + res[0].product_name + "(s). \n Total Cost: $" + totalCost + ".\n Please choose any key to continue, or q to quit."
+      }
+    ]).then(function(response){
+      switch(response.userInput){
+        case "q": 
+          connection.end();
+          break;
+        default: 
+          displayItems();
+      }
 
 
   });
+}
+});
 }
 
 function updateProducts(itemId, newAmount){
@@ -141,7 +160,6 @@ function updateProducts(itemId, newAmount){
       function(err, res){
         if (err) throw err;
         console.log(res.affectedRows + " products updated!\n");
-        displayItems();
       }
     );
 
