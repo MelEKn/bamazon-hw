@@ -117,15 +117,33 @@ function readProducts(itemId, amount) {
     }
     //If the program runs the next part, then the amount of an item the user is asking to buy is less than or equal to the available inventory. 
 
+    var newAmount = res[0].stock_quantity - amount;
 
+    updateProducts(itemId, newAmount);
     //console.log(res);
 
 
   });
 }
 
-function updateProducts(itemId, amount){
-    var queryText = "UPDATE products SET ? WHERE ?"
+function updateProducts(itemId, newAmount){
+    var queryText = "UPDATE products SET ? WHERE ?";
+
+    var query = connection.query(queryText, 
+      [
+        {
+          stock_quantity: newAmount
+        },
+        {
+          item_id: itemId
+        }
+      ],
+      function(err, res){
+        if (err) throw err;
+        console.log(res.affectedRows + " products updated!\n");
+        displayItems();
+      }
+    );
 
 
 }
