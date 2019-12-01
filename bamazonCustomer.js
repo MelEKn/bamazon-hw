@@ -21,7 +21,7 @@ connection.connect(function (err) {
   if (err) throw err;
   console.log("connected as id " + connection.threadId + "\n");
   displayItems();
-  customerPrompt();
+  
 });
 
 function displayItems() {
@@ -56,6 +56,7 @@ function displayItems() {
     }
     console.log(displayString);
     console.log("-----------------------------------");
+    customerPrompt();
   });
   console.log("\n");
   
@@ -68,20 +69,24 @@ function customerPrompt(){
       type: "input",
       name: "itemId",
       message: "Please enter the ID of the item you'd like to buy (enter q to quit): "
-    },
-  
-    {
-      type: "input",
-      name: "howMany",
-      message: "How many would you like to buy?"
     }
-  ]).then(function(answer) {
-    if(answer.itemId==="q"){
-      console.log("Thank you, please come again soon!");
+  ]).then(function(response){
+    if(response.itemId==="q"){
       connection.end();
     }
-
-  });
+    else{
+      inquirer.prompt( {
+        type: "input",
+        name: "howMany",
+        message: "How many would you like to buy?"
+      }).then(function(answer) {
+        console.log("You want to buy " + response.itemId);
+        console.log("You want to buy " + answer.howMany + " of them");
+        
+        });
+  
+    }
+  }) 
 }
 
 function addSpaces(num){
