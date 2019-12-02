@@ -27,11 +27,13 @@ connection.connect(function (err) {
 //The below shows the user the table of items for sale, their IDs, department, price, and how many are in the inventory
 
 function displayItems() {
-  var displayString = "\nItem id:   ";
+  var displayString = "\nItem ID:   ";
   displayString += "Item:" + addSpaces(18);
   displayString += "Department:" + addSpaces(13);
   displayString += "Price:" + addSpaces(17);
   displayString += "Inventory:" + "\n\n";
+
+  var maxID = 0;
 
   connection.query("SELECT * FROM products", function(err, res) {
     if (err) throw err;
@@ -54,16 +56,17 @@ function displayItems() {
       displayString += addSpaces(20-priceString.length);
       displayString += " | " + res[i].stock_quantity;
       displayString += "\n";
+      maxID = i;
     }
     console.log(displayString);
     console.log("-----------------------------------");
-    customerPrompt();
+    customerPrompt(maxID);
   });
   console.log("\n");
   
 }
 
-function customerPrompt(){
+function customerPrompt(maxID){
   inquirer.prompt([
     {
       type: "input",
@@ -71,8 +74,16 @@ function customerPrompt(){
       message: "Please enter the ID of the item you'd like to buy (enter q to quit): "
     }
   ]).then(function(response){
+    //Ends program if the user chooses "q"
     if(response.itemId==="q"){
       connection.end();
+    }
+    //Error response if the user choses an invalid ID number
+    //And then goes back to the beginning of the program
+    else if(response.itemId>maxID){
+      console.log("I'm sorry, that is not a valid ID number. Please try again!");
+      console.log("These are the items available for sale: ");
+     displayItems(); 
     }
     else{
       inquirer.prompt( {
