@@ -58,6 +58,7 @@ function displayItems() {
       displayString += "\n";
       maxID = i;
     }
+    maxID++;
     console.log(displayString);
     console.log("-----------------------------------");
     customerPrompt(maxID);
